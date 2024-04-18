@@ -78,3 +78,56 @@ config = {
 }
 result = benchmarker.evaluate(config)
 print(result)
+
+from hpobench.benchmarks.ml.xgboost_benchmark_old import XGBoostBenchmark
+from hpobench.benchmarks.ml.svm_benchmark_old import SupportVectorMachine
+from loguru import logger
+
+
+def runXGBoostHPO(task_id, config, benchmark):
+    result_dict = benchmark.objective_function(configuration=config,
+                                               fidelity={"n_estimators": 128, "dataset_fraction": 1}, rng=1)
+
+    logger.debug(f"task id: {str(task_id)} \n result_dict: {result_dict}")
+    train_loss = result_dict['info']["train_loss"]
+    valid_loss = result_dict['function_value']
+    return train_loss, valid_loss
+
+
+def runSVMHPO(task_id, config, benchmark):
+    result_dict = benchmark.objective_function(configuration=config,
+                                               fidelity={"dataset_fraction": 1}, rng=1)
+
+    logger.debug(f"task id: {str(task_id)} \n result_dict: {result_dict}")
+    train_loss = result_dict['info']["train_loss"]
+    valid_loss = result_dict['function_value']
+    return train_loss, valid_loss
+
+
+xgb_training_log = {}
+svm_training_log = {}
+for task in [75227, 266, 261, 75099]:
+    xgbb = XGBoostBenchmark(task_id=task)
+    svmb = SupportVectorMachine(task_id=task)
+    xgbcs = xgbb.get_configuration_space()
+    svmcs = svmb.get_configuration_space()
+
+    config_xgb = xgbcs.sample_configuration()
+
+    logger.debug(f"task id: {str(task)} \n ML model: XGBoost \n configuration space: {xgbcs}")
+    logger.debug(f"task id: {str(task)} \n ML model: SVM \n configuration space: {svmcs}")
+    # define config_xgb and config_svm for the four tasks here
+
+    xgb_train_loss, xgb_valid_loss = runXGBoostHPO(task, config_xgb, xgbb)
+    svm_train_loss, svm_valid_loss = runSVMHPO(task, config_svm, svmb)
+
+    xgb_training_log[task] = {"configuration_space": xgbcs,
+                              "config": config_xgb,
+                              "train_loss": xgb_train_loss,
+                              "valid_loss": xgb_valid_loss}
+    svm_training_log[task] = {"configuration_space": svmcs,
+                              "config": config_svm,
+                              "train_loss": svm_train_loss,
+                              "valid_loss": svm_valid_loss}
+
+# we can do 20 or 33 hold out set
