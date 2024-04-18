@@ -20,3 +20,4 @@ for dataset, id in task_dict.items():
         loss_log = bm_obj.evaluate(sample_config)
         print(loss_log)
     break
+
