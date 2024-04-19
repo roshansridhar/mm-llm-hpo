@@ -42,16 +42,15 @@ class Benchmarker:
 
         return config_space_dict
 
-    def evaluate(self, config, if_test=False, rng=1):
-        start_time = time.time()
-        result_dict = self.benchmarker.objective_function(
-            configuration=config, fidelity=self.fidelity, rng=rng)
+    def evaluate(self, config, if_test=False, seed=1):
+        result_dict = self.benchmarker.objective_function(configuration=config, fidelity=self.fidelity, rng=seed)
 
         logger.debug(f"task id: {str(self.task_id)} \n config: {config} \n result_dict: {result_dict}")
         train_loss = result_dict['info']["train_loss"]
         val_loss = result_dict['info']["test_loss"]
-        eval_time = time.time() - start_time
+        eval_cost = result_dict['cost']
         loss_log = {"train_loss": train_loss,
-                    "validation_loss": val_loss}
+                    "validation_loss": val_loss,
+                    "cost": eval_cost}
 
         return loss_log
