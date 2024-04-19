@@ -9,7 +9,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-keyop = os.getenv('KEY')
+opk = os.getenv('KEY')  # add your API key in .env file
 
 # Assuming all necessary classes and functions have been imported
 def run_optimizers(benchmarker, optimizers, iterations):
@@ -31,7 +31,7 @@ benchmarker_nn = TestNNBenchmarker()
 benchmarker_lr = LogisticRegressionBenchmarker()
 
 # Initialize optimizers
-opk = "sk-"  # Placeholder for API key
+
 optimizers_nn = {
     "RandomSearch": RandomSearchOptimizer(benchmarker_nn),
     "LLMOptimizer": LLMOptimizer(benchmarker_nn, opk)
@@ -43,7 +43,7 @@ optimizers_lr = {
 }
 
 # Run experiments
-iterations = 1
+iterations = 5
 results_nn = run_optimizers(benchmarker_nn, optimizers_nn, iterations)
 results_lr = run_optimizers(benchmarker_lr, optimizers_lr, iterations)
 

@@ -6,3 +6,5 @@
 .idea/
 
 .env
+
+examples/*.csv
