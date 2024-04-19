@@ -8,10 +8,12 @@ class RandomSearchOptimizer(BaseOptimizer):
         for _ in range(iterations):
             config = {}
             for param, values in search_space.items():
-                if isinstance(values, tuple) and isinstance(values[0], (int, float)) and isinstance(values[1], (int, float)):
+                if isinstance(values, tuple) and isinstance(values[0], float) and isinstance(values[1], float):
                     config[param] = np.random.uniform(values[0], values[1])
+                elif isinstance(values, tuple) and isinstance(values[0], int) and isinstance(values[1], int):
+                    config[param] = np.random.randint(values[0], values[1])
                 elif isinstance(values, list):
                     config[param] = np.random.choice(values)
             score = self.benchmarker.evaluate(config)
-            self.history.append((config, score))
+            self.history.append((_, config, score))
         return self.history

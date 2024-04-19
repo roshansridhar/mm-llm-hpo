@@ -49,7 +49,7 @@ class Benchmarker:
 
         logger.debug(f"task id: {str(self.task_id)} \n config: {config} \n result_dict: {result_dict}")
         train_loss = result_dict['info']["train_loss"]
-        val_loss = result_dict['info']["val_loss"]
+        val_loss = result_dict['info']["test_loss"]
         eval_time = time.time() - start_time
         loss_log = {"train_loss": train_loss,
                     "validation_loss": val_loss}

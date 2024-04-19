@@ -8,3 +8,5 @@
 .env
 
 examples/*.csv
+
+examples/*.png

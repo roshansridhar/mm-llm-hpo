@@ -1,7 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from benchmarkers.test_nn_benchmarker import TestNNBenchmarker
+from benchmarkers.benchmarker import Benchmarker
+import json
 from optimizers.random_search import RandomSearchOptimizer
 from benchmarkers.test_lr_benchmarker import LogisticRegressionBenchmarker
 from optimizers.llm_optimizer import LLMOptimizer
@@ -16,8 +17,11 @@ def run_optimizers(benchmarker, optimizers, iterations):
     results = []
     for name, optimizer in optimizers.items():
         result = optimizer.optimize(iterations, )
-        for config, metrics in result:
+        for i, config, metrics in result:
             metrics.update({
+                "dataset_name": dataset,
+                "task_id": benchmarker.task_id,
+                "iteration": i,
                 "optimizer": name,
                 "benchmarker": type(benchmarker).__name__,
                 "config": str(config)  # Convert config dict to string for easier handling in DataFrame
@@ -26,44 +30,50 @@ def run_optimizers(benchmarker, optimizers, iterations):
     return results
 
 
-# Initialize benchmarkers
-benchmarker_nn = TestNNBenchmarker()
-benchmarker_lr = LogisticRegressionBenchmarker()
 
-# Initialize optimizers
+task_id_path = "task_ids.json"
 
-optimizers_nn = {
-    "RandomSearch": RandomSearchOptimizer(benchmarker_nn),
-    "LLMOptimizer": LLMOptimizer(benchmarker_nn, opk)
-}
+with open(task_id_path, "r") as file:
+    task_dict = json.load(file)
 
-optimizers_lr = {
-    "RandomSearch": RandomSearchOptimizer(benchmarker_lr),
-    "LLMOptimizer": LLMOptimizer(benchmarker_lr, opk)
-}
 
-# Run experiments
-iterations = 5
-results_nn = run_optimizers(benchmarker_nn, optimizers_nn, iterations)
-results_lr = run_optimizers(benchmarker_lr, optimizers_lr, iterations)
+for dataset, id in task_dict.items():
+    results = []
+    for model in ["svm", "xgb"]:
+        # Initialize benchmarkers
+        benchmarker = Benchmarker(id, model)
+        search_space = benchmarker.get_search_space()
+        print(dataset)
+        print(benchmarker.task_id)
+        print(benchmarker.model_name)
+        print(search_space)
 
-# Combine and convert to DataFrame
-all_results = results_nn + results_lr
-df = pd.DataFrame(all_results)
 
-# Save results to CSV (optional)
-df.to_csv("optimizer_results.csv", index=False)
+        # Initialize optimizers
+        optimizers = {
+            "RandomSearch": RandomSearchOptimizer(benchmarker),
+            "LLMOptimizer": LLMOptimizer(benchmarker, opk)
+        }
+        # Run experiments
+        iterations = 5
+        # Combine the results for one dataset
+        results += (run_optimizers(benchmarker, optimizers, iterations))
 
-# Set up the plot
-plt.figure(figsize=(12, 6))
-sns.boxplot(data=df, x='optimizer', y='function_value', hue='benchmarker')
-plt.title('Comparison of Optimizer Performance by Function Value')
-plt.ylabel('Function Value (Error)')
-plt.xlabel('Optimizer')
-plt.legend(title='Benchmarker')
 
-# Save the figure
-plt.savefig('optimizer_performance_comparison.png', dpi=300)  # Saves the figure as a PNG file with high resolution
+    # Save results to CSV (optional)
+    df = pd.DataFrame(results)
+    df.to_csv(f"optimizer_results_for_dataset_{dataset}.csv", index=False)
 
-# Clear the figure after saving to free memory, especially useful if creating many plots in a loop
-plt.clf()
+    # Set up the plot
+    plt.figure(figsize=(12, 6))
+    sns.boxplot(data=df, x='optimizer', y='validation_loss', hue='benchmarker')
+    plt.title(f'Comparison of Optimizer Performance for dataset {dataset}')
+    plt.ylabel('Function Value (Error)')
+    plt.xlabel('Optimizer')
+    plt.legend(title='Benchmarker')
+
+    # Save the figure
+    plt.savefig(f'optimizer_performance_comparison_for_dataset_{dataset}.png', dpi=300)  # Saves the figure as a PNG file with high resolution
+
+    # Clear the figure after saving to free memory, especially useful if creating many plots in a loop
+    plt.clf()
