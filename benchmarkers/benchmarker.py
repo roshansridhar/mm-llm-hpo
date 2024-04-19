@@ -23,7 +23,15 @@ class Benchmarker:
 
     def parse_config_space(self, config_space_str):
         cs_range = re.split(", Default", re.split('Range: ', config_space_str)[-1])[0]
-        return cs_range
+        low_and_high = re.findall(r"[-+]?(?:\d*\.*\d+)", cs_range)
+        cs_list = []
+        for number in low_and_high:
+            try:
+                cs_list.append(int(number))
+            except ValueError:
+                cs_list.append(float(number))
+        cs_tuple = tuple(cs_list)
+        return cs_tuple
 
     def get_search_space(self, seed=1):
         self.config_space = self.benchmarker.get_configuration_space(seed)
