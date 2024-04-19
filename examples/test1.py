@@ -5,7 +5,11 @@ from benchmarkers.test_nn_benchmarker import TestNNBenchmarker
 from optimizers.random_search import RandomSearchOptimizer
 from benchmarkers.test_lr_benchmarker import LogisticRegressionBenchmarker
 from optimizers.llm_optimizer import LLMOptimizer
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+keyop = os.getenv('KEY')
 
 # Assuming all necessary classes and functions have been imported
 def run_optimizers(benchmarker, optimizers, iterations):
