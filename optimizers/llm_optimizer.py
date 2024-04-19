@@ -16,8 +16,21 @@ class LLMOptimizer(BaseOptimizer):
                 messages=[{"role": "system", "content": "You are a machine learning expert."}, {"role": "user", "content": prompt}],
                 temperature=0.7, max_tokens=150, top_p=1
             )
-            config = json.loads(response.choices[0].message.content.strip())
+
+            ifDecodeError = False
+            while not ifDecodeError:
+                try:
+                    config = json.loads(response.choices[0].message.content.strip())
+                    ifDecodeError = True
+                except json.decoder.JSONDecodeError:
+                    response = self.client.chat.completions.create(
+                        model="gpt-3.5-turbo",
+                        messages=[{"role": "system", "content": "You are a machine learning expert."},
+                                  {"role": "user", "content": prompt}],
+                        temperature=0.7, max_tokens=150, top_p=1
+                    )
+
             score = self.benchmarker.evaluate(config)
-            self.history.append((config, score))
+            self.history.append((_, config, score))
         return self.history
 
