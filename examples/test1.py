@@ -54,7 +54,7 @@ for dataset, dataset_id in task_dict.items():
             "GPT4VisionOptimizer": GPT4VisionOptimizer(benchmarker, opk),
         }
         # Run experiments
-        iterations = 2
+        iterations = 10
         # Combine the results for one dataset
         results += run_optimizers(benchmarker, optimizers, iterations)
 

@@ -7,6 +7,10 @@ class BaseOptimizer:
     def __init__(self, benchmarker):
         self.benchmarker = benchmarker
         self.history = []
+        self.hyperparameter_def = {
+            "SupportVectorMachine": "Here is the description of hyperparameters:\nC: regularization parameter. The strength of the regularization is inversely proportional to C. The penalty is a squared l2 penalty.\n gamma: Kernel coefficient for rbf.",
+            "XGBoost": "Here is the description of hyperparameters:\ncolsample_bytree: Subsample ratio of columns when constructing each tree.\n eta: Boosting learning rate.\n max_depth: Maximum tree depth for base learners.\n reg_lambda: L2 regularization term on weights."
+            }
 
     def optimize(self, iterations, **kwargs):
         raise NotImplementedError("This method should be implemented by subclasses.")
@@ -18,6 +22,7 @@ class BaseOptimizer:
             prompt = f"You are helping to tune hyperparameters for a {model_name} model for the first time. Here is " \
                      f"the search space:\n "
             prompt += json.dumps(search_space, indent=2) + "\n"
+            prompt += self.hyperparameter_def[model_name] + "\n"
             prompt += "Please suggest the initial configuration strictly in JSON format. Config:"
         else:
             prompt = "You are helping tune hyperparameters for a {model_name} model. Here is what is tried so far:\n"
@@ -34,7 +39,7 @@ class BaseOptimizer:
             return None
 
         # Extract validation loss and iterations
-        iterations = list(range(len(self.history)))
+        iterations = [i+1 for i in list(range(len(self.history)))]
         validation_losses = [entry[2]['validation_loss'] for entry in self.history]
 
         # Plot validation loss over iterations
