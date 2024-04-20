@@ -28,7 +28,7 @@ def run_optimizers(benchmarker, optimizers, iterations):
                 "task_id": benchmarker.task_id,
                 "iteration": iteration,
                 "optimizer": name,
-                "benchmarker": type(benchmarker).__name__,
+                "benchmarker": benchmarker.model_name,
                 "config": str(config)  # Convert config dict to string for easier handling in DataFrame
             })
             results.append(metrics)
@@ -45,10 +45,6 @@ for dataset, dataset_id in task_dict.items():
         # Initialize benchmarkers
         benchmarker = Benchmarker(dataset_id, model, output_dir)
         search_space = benchmarker.get_search_space()
-        print(dataset)
-        print(benchmarker.task_id)
-        print(benchmarker.model_name)
-        print(search_space)
 
         # Initialize optimizers
         optimizers = {
@@ -67,12 +63,13 @@ for dataset, dataset_id in task_dict.items():
     df.to_csv(os.path.join(output_dir, f"optimizer_results_for_dataset_{dataset}.csv"), index=False)
 
     # Set up the plot
+    df_min_loss = df.loc[df.groupby(["benchmarker", "optimizer"]).validation_loss.idxmin()]
     plt.figure(figsize=(12, 6))
-    sns.boxplot(data=df, x='optimizer', y='validation_loss', hue='benchmarker')
+    sns.barplot(data=df_min_loss, x='optimizer', y='validation_loss', hue='benchmarker')
     plt.title(f'Comparison of Optimizer Performance for dataset {dataset}')
-    plt.ylabel('Function Value (Error)')
+    plt.ylabel('Error rate (1-accuracy)')
     plt.xlabel('Optimizer')
-    plt.legend(title='Benchmarker')
+    plt.legend(title='ML Model')
 
     # Save the figure
     plt.savefig(os.path.join(output_dir, f'optimizer_performance_comparison_for_dataset_{dataset}.png'), dpi=300)

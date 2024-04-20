@@ -20,6 +20,10 @@ class LLMOptimizer(BaseOptimizer):
                     temperature=0.8, max_tokens=100, top_p=1)
                 try:
                     config = json.loads(response.choices[0].message.content.strip())
+                    for parameter_name, parameter_value in config.items():
+                        if parameter_value < self.benchmarker.search_space[parameter_name][0] or \
+                                parameter_value > self.benchmarker.search_space[parameter_name][1]:
+                            config = None
                 except json.decoder.JSONDecodeError:
                     # If decoding fails, the loop continues and requests another completion
                     continue
