@@ -1,9 +1,6 @@
-import time
-import re
 from hpobench.benchmarks.ml.xgboost_benchmark import XGBoostBenchmark
 from hpobench.benchmarks.ml.svm_benchmark import SVMBenchmark
 from loguru import logger
-
 
 
 class Benchmarker:
@@ -42,7 +39,7 @@ class Benchmarker:
 
         return config_space_dict
 
-    def evaluate(self, config, if_test=False, seed=1):
+    def evaluate(self, config, seed=1):
         result_dict = self.benchmarker.objective_function(configuration=config, fidelity=self.fidelity, rng=seed)
 
         logger.debug(f"task id: {str(self.task_id)} \n config: {config} \n result_dict: {result_dict}")
