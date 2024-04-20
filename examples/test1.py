@@ -45,10 +45,6 @@ for dataset, dataset_id in task_dict.items():
         # Initialize benchmarkers
         benchmarker = Benchmarker(dataset_id, model, output_dir)
         search_space = benchmarker.get_search_space()
-        print(dataset)
-        print(benchmarker.task_id)
-        print(benchmarker.model_name)
-        print(search_space)
 
         # Initialize optimizers
         optimizers = {
@@ -58,7 +54,7 @@ for dataset, dataset_id in task_dict.items():
             "GPT4VisionOptimizer": GPT4VisionOptimizer(benchmarker, opk),
         }
         # Run experiments
-        iterations = 3
+        iterations = 2
         # Combine the results for one dataset
         results += run_optimizers(benchmarker, optimizers, iterations)
 
@@ -71,9 +67,9 @@ for dataset, dataset_id in task_dict.items():
     plt.figure(figsize=(12, 6))
     sns.barplot(data=df_min_loss, x='optimizer', y='validation_loss', hue='benchmarker')
     plt.title(f'Comparison of Optimizer Performance for dataset {dataset}')
-    plt.ylabel('Function Value (Error)')
+    plt.ylabel('Error rate (1-accuracy)')
     plt.xlabel('Optimizer')
-    plt.legend(title='Benchmarker')
+    plt.legend(title='ML Model')
 
     # Save the figure
     plt.savefig(os.path.join(output_dir, f'optimizer_performance_comparison_for_dataset_{dataset}.png'), dpi=300)
