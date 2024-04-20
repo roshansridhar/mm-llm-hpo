@@ -3,7 +3,7 @@ import base64
 import json
 from optimizers.base_optimizer import BaseOptimizer
 import re
-
+from loguru import logger
 
 class GPT4VisionOptimizer(BaseOptimizer):
     def __init__(self, benchmarker, openai_api_key):
@@ -36,7 +36,14 @@ class GPT4VisionOptimizer(BaseOptimizer):
                     try:
                         config = json.loads(
                             re.search(r'\{(.*?)\}', response['choices'][0]['message']['content'], re.DOTALL).group())
+                        for parameter_name, parameter_value in config.items():
+                            if parameter_value < self.benchmarker.search_space[parameter_name][0] or \
+                                    parameter_value > self.benchmarker.search_space[parameter_name][1]:
+                                logger.debug(f"config is outside of the search space. Request again. Config: {config}")
+                                config = None
+                                break
                     except:
+                        logger.debug(f"response is not json format. Request again. Response: {response['choices'][0]['message']['content']}")
                         continue  # If decoding fails, retry the request
 
             score = self.benchmarker.evaluate(config)
