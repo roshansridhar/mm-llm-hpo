@@ -7,6 +7,7 @@ import json
 from optimizers.random_search import RandomSearchOptimizer
 from optimizers.llm_optimizer import LLMOptimizer
 from optimizers.bayesian_optimizer import BayesianOptimizer
+from optimizers.vision_optimizer import GPT4VisionOptimizer
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -42,7 +43,7 @@ for dataset, dataset_id in task_dict.items():
     results = []
     for model in ["svm", "xgb"]:
         # Initialize benchmarkers
-        benchmarker = Benchmarker(dataset_id, model)
+        benchmarker = Benchmarker(dataset_id, model, output_dir)
         search_space = benchmarker.get_search_space()
         print(dataset)
         print(benchmarker.task_id)
@@ -53,7 +54,8 @@ for dataset, dataset_id in task_dict.items():
         optimizers = {
             "RandomSearch": RandomSearchOptimizer(benchmarker),
             "LLMOptimizer": LLMOptimizer(benchmarker, opk),
-            "BayesianOptimizer": BayesianOptimizer(benchmarker)
+            "BayesianOptimizer": BayesianOptimizer(benchmarker),
+            "GPT4VisionOptimizer": GPT4VisionOptimizer(benchmarker, opk),
         }
         # Run experiments
         iterations = 2

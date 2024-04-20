@@ -17,7 +17,7 @@ class LLMOptimizer(BaseOptimizer):
                     model="gpt-3.5-turbo",
                     messages=[{"role": "system", "content": "You are a machine learning expert."},
                               {"role": "user", "content": prompt}],
-                    temperature=0.7, max_tokens=150, top_p=1)
+                    temperature=0.8, max_tokens=100, top_p=1)
                 try:
                     config = json.loads(response.choices[0].message.content.strip())
                 except json.decoder.JSONDecodeError:

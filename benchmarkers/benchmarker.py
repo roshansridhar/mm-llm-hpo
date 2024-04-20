@@ -7,8 +7,9 @@ from loguru import logger
 
 
 class Benchmarker:
-    def __init__(self, task_id, model_name="xgb"):
+    def __init__(self, task_id, model_name="xgb", output_dir="."):
         self.task_id = task_id
+        self.output_dir = output_dir
         self.config_space = None
         if model_name == "xgb":
             self.model_name = "XGBoost"
