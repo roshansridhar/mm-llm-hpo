@@ -48,8 +48,6 @@ class GPT4VisionOptimizer(BaseOptimizer):
                     except:
                         logger.debug(f"response is not json format. Request again. Response: {response['choices'][0]['message']['content']}")
                         continue  # If decoding fails, retry the request
-            print(prompt)
-            print(response)
             score = self.benchmarker.evaluate(config)
             self.history.append((iteration, config, score))
             # self.history.append((iteration, {'C': 0.0009765625, 'gamma': 0.0009765625},

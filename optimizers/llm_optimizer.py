@@ -36,8 +36,6 @@ class LLMOptimizer(BaseOptimizer):
                     except:
                         logger.debug(f"response is not json format. Request again. Response: {response_content}")
                         continue  # If decoding fails, retry the request
-            print(prompt)
-            print(response_content)
             score = self.benchmarker.evaluate(config)
             self.history.append((iteration, config, score))
         return self.history
