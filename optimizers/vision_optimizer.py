@@ -50,7 +50,4 @@ class GPT4VisionOptimizer(BaseOptimizer):
                         continue  # If decoding fails, retry the request
             score = self.benchmarker.evaluate(config)
             self.history.append((iteration, config, score))
-            # self.history.append((iteration, {'C': 0.0009765625, 'gamma': 0.0009765625},
-            #                      {'train_loss': 1.0, 'validation_loss': 0.29276500280426243,
-            #                       'cost': 0.3861689567565918}))
         return self.history
