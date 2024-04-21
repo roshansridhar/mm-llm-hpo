@@ -18,7 +18,7 @@ class LLMOptimizer(BaseOptimizer):
                     model="gpt-4-turbo",
                     messages=[{"role": "system", "content": "You are a machine learning expert."},
                               {"role": "user", "content": prompt}],
-                    temperature=0.8, max_tokens=100, top_p=1)
+                    temperature=0.1, max_tokens=500, top_p=1)
                 response_content = response.choices[0].message.content.strip()
                 try:
                     config = json.loads(response_content)

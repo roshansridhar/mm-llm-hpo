@@ -15,7 +15,7 @@ class BaseOptimizer:
     def optimize(self, iterations, **kwargs):
         raise NotImplementedError("This method should be implemented by subclasses.")
 
-    def generate_prompt(self, history, additional_info=""):
+    def generate_prompt(self, history, additional_info="", is_vision=False):
         model_name = self.benchmarker.model_name
         search_space = self.benchmarker.get_search_space()
         if not history:
@@ -23,14 +23,24 @@ class BaseOptimizer:
                      f"the search space:\n "
             prompt += json.dumps(search_space, indent=2) + "\n"
             prompt += self.hyperparameter_def[model_name] + "\n"
+            prompt += "We have a budget to try 10 configurations in total. The goal is to find the configuration that minimizes the validation loss with the given budget" + "\n"
             prompt += "Please suggest the initial configuration strictly in JSON format. Config:"
         else:
-            prompt = "You are helping tune hyperparameters for a {model_name} model. Here is what is tried so far:\n"
-            for i, config, score in history:
-                prompt += f"Config: {config}, Score: {score}\n"
-            prompt += additional_info
-            prompt += f"Please provide the next configuration strictly in JSON format within the search space:\n"
-            prompt += f"{json.dumps(search_space, indent=2)}\nConfig:"
+            if is_vision:
+                prompt = f"You are helping tune hyperparameters for a {model_name} model. Here is what is tried so far:\n"
+                for i, config, score in history:
+                    prompt += f"Iteration: {i+1}, Config: {config}\n"
+                prompt += "The validation loss for each iteration as shown in the image."
+                prompt += f"Please provide the next configuration strictly in JSON format within the search space:\n"
+                prompt += f"{json.dumps(search_space, indent=2)}\nConfig:"
+
+            else:
+                prompt = f"You are helping tune hyperparameters for a {model_name} model. Here is what is tried so far:\n"
+                for i, config, score in history:
+                    prompt += f"Config: {config}, Validation_loss: {score['validation_loss']}\n"
+                prompt += additional_info
+                prompt += f"Please provide the next configuration strictly in JSON format within the search space:\n"
+                prompt += f"{json.dumps(search_space, indent=2)}\nConfig:"
         return prompt
 
     def plot_validation_loss(self):

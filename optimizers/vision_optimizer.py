@@ -24,7 +24,9 @@ class GPT4VisionOptimizer(BaseOptimizer):
                 headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}
                 payload = {"model": "gpt-4-turbo",
                            "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}],
-                           "max_tokens": 100}
+                           "temperature": 0.1,
+                           "max_tokens": 500,
+                           "top_p": 1}
                 if plot_base64:
                     payload['messages'][0]['content'].append(
                         {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{plot_base64}"}})
