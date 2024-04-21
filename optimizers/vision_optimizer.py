@@ -18,7 +18,7 @@ class GPT4VisionOptimizer(BaseOptimizer):
         for iteration in range(iterations):
             plot_path = self.plot_validation_loss()
             plot_base64 = self.encode_image(plot_path) if plot_path else None
-            prompt = self.generate_prompt(self.history, is_vision=True)
+            prompt = self.generate_prompt(self.history)
             config = None
             while config is None:
                 headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}
