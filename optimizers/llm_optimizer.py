@@ -18,7 +18,7 @@ class LLMOptimizer(BaseOptimizer):
                     model="gpt-4-turbo",
                     messages=[{"role": "system", "content": "You are a machine learning expert."},
                               {"role": "user", "content": prompt}],
-                    temperature=0.1, max_tokens=500, top_p=1)
+                    temperature=0, max_tokens=2000, top_p=1)
                 response_content = response.choices[0].message.content.strip()
                 try:
                     config = json.loads(response_content)
@@ -36,7 +36,6 @@ class LLMOptimizer(BaseOptimizer):
                     except:
                         logger.debug(f"response is not json format. Request again. Response: {response_content}")
                         continue  # If decoding fails, retry the request
-
             score = self.benchmarker.evaluate(config)
             self.history.append((iteration, config, score))
         return self.history

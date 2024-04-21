@@ -64,7 +64,7 @@ class BaseOptimizer:
         # Save plot to a temporary file and return the file path
         output_dir = self.benchmarker.output_dir
         os.makedirs(output_dir, exist_ok=True)
-        plot_path = os.path.join(output_dir, f"validation_loss_plot_{self.benchmarker.task_id}_{len(iterations)}.png")
+        plot_path = os.path.join(output_dir, f"validation_loss_plot_{self.benchmarker.model_name}_{self.benchmarker.task_id}_{len(iterations)}.png")
         plt.savefig(plot_path)
         plt.close()
         return plot_path
